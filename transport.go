@@ -3,9 +3,9 @@ package cronet
 import (
 	"context"
 	"errors"
+	http "github.com/bogdanfinn/fhttp"
 	"io"
 	"net"
-	"net/http"
 	"net/textproto"
 	"os"
 	"runtime"
