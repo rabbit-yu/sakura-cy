@@ -1,4 +1,4 @@
-module github.com/rabbit-yu/cronet-go
+module github.com/rabbit-yu/sakura-cy
 
 go 1.23.0
 
