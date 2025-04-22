@@ -80,16 +80,36 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	} else {
 		requestParams.SetMethod(request.Method)
 	}
-	for key, values := range request.Header {
-		for _, value := range values {
-			header := NewHTTPHeader()
-			header.SetName(key)
-			header.SetValue(value)
-			requestParams.AddHeader(header)
-			header.Destroy()
 
+	order, hasOrder := request.Header[http.HeaderOrderKey]
+	if hasOrder {
+		// 按 HeaderOrderKey 顺序添加
+		for _, key := range order {
+			values, exists := request.Header[key]
+			if !exists {
+				continue
+			}
+			for _, value := range values {
+				header := NewHTTPHeader()
+				header.SetName(key)
+				header.SetValue(value)
+				requestParams.AddHeader(header)
+				header.Destroy()
+			}
+		}
+	} else {
+		// 默认顺序添加（map 顺序不稳定）
+		for key, values := range request.Header {
+			for _, value := range values {
+				header := NewHTTPHeader()
+				header.SetName(key)
+				header.SetValue(value)
+				requestParams.AddHeader(header)
+				header.Destroy()
+			}
 		}
 	}
+
 	if request.Body != nil && request.Body != http.NoBody {
 		uploadProvider := NewUploadDataProvider(&bodyUploadProvider{request.Body, request.GetBody, request.ContentLength})
 		requestParams.SetUploadDataProvider(uploadProvider)
